@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo de Gráficos no Streamlit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#FF4B4B',
+                            dark: '#0E1117',
+                            card: '#262730',
+                            gray: '#808495',
+                            lightBg: '#F0F2F6',
+                            lightCard: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        pre code { font-family: 'JetBrains Mono', monospace; }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .dark ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: #FF4B4B; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e03e3e; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-brand-dark text-gray-800 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-brand-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-red text-white p-2 rounded-xl shadow-lg shadow-brand-red/30">
+                    <i class="fa-solid fa-chart-simple text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight leading-tight">
+                        Streamlit <span class="text-brand-red">Charts Guide</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Interactive Masterclass</p>
+                </div>
+            </div>
+
+            <!-- Actions Header -->
+            <div class="flex items-center space-x-3">
+                <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:text-brand-red dark:hover:text-brand-red transition-all">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+                </button>
+                <a href="#prep-dados" class="hidden sm:inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-brand-red hover:bg-red-600 rounded-xl shadow-md transition-all">
+                    <i class="fa-solid fa-database mr-2"></i> Preparação de Dados
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-red-50/50 via-transparent to-transparent dark:from-brand-red/10 dark:via-transparent dark:to-transparent border-b border-gray-200 dark:border-gray-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-red/10 text-brand-red border border-brand-red/20 mb-4">
+                <i class="fa-solid fa-bolt text-xs"></i> Guia Interativo Hands-on
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight max-w-4xl mx-auto leading-tight">
+                Domine a Criacao de <span class="bg-gradient-to-r from-brand-red to-orange-500 bg-clip-text text-transparent">Graficos Incriveis</span> no Streamlit
+            </h1>
+            <p class="mt-4 text-sm sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-normal">
+                Aprenda exatamente quando, por que e como utilizar cada tipo de gráfico usando Python, Pandas e Plotly Express no Streamlit.
+            </p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- SIDEBAR NAVIGATION -->
+            <aside class="lg:col-span-3">
+                <div class="sticky top-24 bg-white dark:bg-brand-card p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-1">
+                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-3 py-2">Tipos de Gráficos</p>
+                    
+                    <button onclick="switchTab('bar')" id="btn-bar" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-bar w-5 text-center text-brand-red"></i> Barras</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('line')" id="btn-line" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-line w-5 text-center text-blue-500"></i> Linhas</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('scatter')" id="btn-scatter" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-circle-dot w-5 text-center text-emerald-500"></i> Dispersão</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('box')" id="btn-box" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-box-archive w-5 text-center text-purple-500"></i> Boxplot</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('histogram')" id="btn-histogram" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-column w-5 text-center text-amber-500"></i> Histograma</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('pie')" id="btn-pie" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-pie w-5 text-center text-pink-500"></i> Pizza / Rosca</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('heatmap')" id="btn-heatmap" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-border-all w-5 text-center text-red-500"></i> Heatmap</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+                    <button onclick="switchTab('metric')" id="btn-metric" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-square-poll-vertical w-5 text-center text-teal-500"></i> Métricas & KPIs</span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                    </button>
+
+                    <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+                        <a href="#prep-dados" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-red bg-brand-red/10 hover:bg-brand-red/20 transition-all">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Preparação com Pandas
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- PLAYGROUND & TUTORIAL VIEW AREA -->
+            <section class="lg:col-span-9 space-y-8">
+
+                <!-- CHART VIEWER CONTAINER -->
+                <div class="bg-white dark:bg-brand-card rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden">
+                    
+                    <!-- Header Info -->
+                    <div id="chart-header" class="p-6 border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
+                        <!-- Dynamic Title and Badge loaded by JS -->
+                    </div>
+
+                    <!-- Interactive Simulator Controls & Canvas -->
+                    <div class="p-6 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                        
+                        <!-- Controls Box -->
+                        <div class="xl:col-span-4 bg-gray-50 dark:bg-gray-900/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                                <span>Controles do Simulador</span>
+                                <i class="fa-solid fa-sliders text-brand-red"></i>
+                            </h4>
+                            <div id="control-panel" class="space-y-4 text-xs">
+                                <!-- Dynamic controls inserted by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Render Window -->
+                        <div class="xl:col-span-8 flex flex-col justify-center items-center min-h-[360px] bg-white dark:bg-brand-dark rounded-xl border border-gray-200 dark:border-gray-800 p-2 relative">
+                            <span class="absolute top-3 left-3 text-[10px] font-mono px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500">Renderização Streamlit (Simulada)</span>
+                            <div id="plotly-render" class="w-full h-[360px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Explanation Section -->
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-circle-question text-brand-red"></i> Quando Usar?
+                            </h4>
+                            <p id="chart-when" class="text-xs leading-relaxed text-gray-600 dark:text-gray-300"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> Por que Escolher?
+                            </h4>
+                            <p id="chart-why" class="text-xs leading-relaxed text-gray-600 dark:text-gray-300"></p>
+                        </div>
+                    </div>
+
+                    <!-- Code Snippets -->
+                    <div class="p-6 bg-gray-900 text-gray-100 border-t border-gray-200 dark:border-gray-800 relative">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-mono font-semibold text-gray-400 flex items-center gap-2">
+                                <i class="fa-brands fa-python text-brand-red"></i> Código Python / Streamlit
+                            </span>
+                            <button onclick="copyCode()" class="text-xs font-mono bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-gray-700 transition-all flex items-center gap-1.5">
+                                <i id="copy-icon" class="fa-regular fa-copy"></i>
+                                <span id="copy-text">Copiar Código</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 bg-gray-950 rounded-xl overflow-x-auto text-xs leading-relaxed"><code id="code-snippet"></code></pre>
+                    </div>
+
+                </div>
+
+                <!-- SPECIAL SECTION: DATA PREPARATION & STRUCTURE -->
+                <div id="prep-dados" class="bg-white dark:bg-brand-card p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-brand-red/10 text-brand-red rounded-xl">
+                            <i class="fa-solid fa-database text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Estrutura e Preparação de Dados</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Como moldar seus DataFrames para alimentar gráficos no Streamlit</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                        <!-- Pandas Melt -->
+                        <div class="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 space-y-3">
+                            <span class="px-2 py-1 rounded bg-blue-500/10 text-blue-500 font-mono font-bold text-[10px]">Pandas Melt</span>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white">Transformando Formato Largo em Longo</h4>
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                                O Plotly Express funciona melhor com DataFrames no formato "Longo" (Tidy Data), onde cada coluna representa uma variável e cada linha uma observação. Use <code>pd.melt()</code> para reorganizar colunas de categorias.
+                            </p>
+                            <pre class="p-3 bg-gray-950 text-gray-200 rounded-lg font-mono text-[11px] overflow-x-auto">
+import pandas as pd
+
+# DataFrame em formato Largo
+df_largo = pd.DataFrame({
+    'UF': ['SP', 'RJ', 'MG'],
+    'Homens': [12.5, 11.2, 10.8],
+    'Mulheres': [18.4, 17.1, 16.5]
+})
+
+# Converte para formato Longo
+df_longo = df_largo.melt(
+    id_vars=['UF'],
+    value_vars=['Homens', 'Mulheres'],
+    var_name='Gênero',
+    value_name='Horas'
+)</pre>
+                        </div>
+
+                        <!-- Render & Layout -->
+                        <div class="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 space-y-3">
+                            <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 font-mono font-bold text-[10px]">Streamlit Integration</span>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white">Exibição Fluida e Cache</h4>
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                                Para otimizar a performance da sua aplicação e garantir responsividade total no Streamlit, utilize o parâmetro <code>use_container_width=True</code> e decore funções de carregamento de dados com <code>@st.cache_data</code>.
+                            </p>
+                            <pre class="p-3 bg-gray-950 text-gray-200 rounded-lg font-mono text-[11px] overflow-x-auto">
+import streamlit as st
+import plotly.express as px
+
+@st.cache_data
+def carregar_dados():
+    return pd.read_csv("dados.csv")
+
+df = carregar_dados()
+
+fig = px.bar(df, x="UF", y="Horas", color="Gênero")
+
+# Garante responsividade perfeita
+st.plotly_chart(fig, use_container_width=True)</pre>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 bg-white dark:bg-brand-card border-t border-gray-200 dark:border-gray-800 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+        <p>Guia Interativo de Gráficos no Streamlit &bull; Criado para desenvolvedores Python &amp; Cientistas de Dados</p>
+    </footer>
+
+    <!-- SCRIPT DE DADOS E LÓGICA DO SIMULADOR -->
+    <script>
+        // Data Store for Charts
+        const chartsData = {
+            bar: {
+                title: "Gráfico de Barras",
+                subtitle: "st.bar_chart & px.bar",
+                tag: "Comparação de Categoria",
+                when: "Ideal para comparar valores entre diferentes categorias discretas (ex: estados, departamentos, gêneros).",
+                why: "Permite rápida leitura e ordenação de dados quantitativos isolados de forma intuitiva.",
+                controls: [
+                    { id: 'orientation', label: 'Orientação', type: 'select', options: [{val: 'v', label: 'Vertical'}, {val: 'h', label: 'Horizontal'}] },
+                    { id: 'barmode', label: 'Modo de Agrupamento', type: 'select', options: [{val: 'group', label: 'Lado a Lado (Group)'}, {val: 'stack', label: 'Empilhado (Stack)'}] },
+                    { id: 'color_scheme', label: 'Paleta de Cores', type: 'select', options: [{val: 'Viridis', label: 'Viridis'}, {val: 'Blues', label: 'Azuis'}, {val: 'Reds', label: 'Vermelhos'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+import pandas as pd
+
+df = pd.DataFrame({
+    'Regiao': ['Suldeste', 'Nordeste', 'Sul', 'Norte', 'Centro-Oeste'],
+    'Mulheres': [18.5, 19.2, 17.8, 18.0, 17.5],
+    'Homens': [10.2, 11.0, 9.8, 10.5, 10.0]
+}).melt(id_vars=['Regiao'], var_name='Gênero', value_name='Horas')
+
+fig = px.bar(
+    df, 
+    ${ctrls.orientation === 'h' ? "x='Horas', y='Regiao'" : "x='Regiao', y='Horas'"}, 
+    color='Gênero',
+    barmode='${ctrls.barmode}',
+    orientation='${ctrls.orientation}',
+    color_continuous_scale='${ctrls.color_scheme}',
+    title="Horas Dedicadas a Afazeres Domésticos por Região"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const isH = ctrls.orientation === 'h';
+                    const data = [
+                        {
+                            x: isH ? [18.5, 19.2, 17.8, 18.0, 17.5] : ['Sudeste', 'Nordeste', 'Sul', 'Norte', 'Centro-Oeste'],
+                            y: isH ? ['Sudeste', 'Nordeste', 'Sul', 'Norte', 'Centro-Oeste'] : [18.5, 19.2, 17.8, 18.0, 17.5],
+                            name: 'Mulheres',
+                            type: 'bar',
+                            orientation: ctrls.orientation,
+                            marker: { color: ctrls.color_scheme === 'Reds' ? '#ef4444' : '#FF4B4B' }
+                        },
+                        {
+                            x: isH ? [10.2, 11.0, 9.8, 10.5, 10.0] : ['Sudeste', 'Nordeste', 'Sul', 'Norte', 'Centro-Oeste'],
+                            y: isH ? ['Sudeste', 'Nordeste', 'Sul', 'Norte', 'Centro-Oeste'] : [10.2, 11.0, 9.8, 10.5, 10.0],
+                            name: 'Homens',
+                            type: 'bar',
+                            orientation: ctrls.orientation,
+                            marker: { color: ctrls.color_scheme === 'Blues' ? '#3b82f6' : '#38bdf8' }
+                        }
+                    ];
+                    return { data, layout: { barmode: ctrls.barmode } };
+                }
+            },
+            line: {
+                title: "Gráfico de Linhas",
+                subtitle: "st.line_chart & px.line",
+                tag: "Séries Temporais",
+                when: "Excelente para mostrar tendências, evolução e padrões ao longo do tempo ou sequências continuas.",
+                why: "Conecta os pontos de dados destacando variações, crescimento ou queda contínua.",
+                controls: [
+                    { id: 'markers', label: 'Exibir Marcadores', type: 'select', options: [{val: 'true', label: 'Sim'}, {val: 'false', label: 'Não'}] },
+                    { id: 'line_shape', label: 'Curvatura da Linha', type: 'select', options: [{val: 'linear', label: 'Reta (Linear)'}, {val: 'spline', label: 'Suave (Spline)'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+import pandas as pd
+
+df = pd.DataFrame({
+    'Ano': [2018, 2019, 2020, 2021, 2022, 2023],
+    'STEM': [28.4, 29.1, 30.5, 31.2, 32.8, 34.0],
+    'Saude': [70.2, 71.0, 71.5, 72.0, 73.1, 74.5]
+}).melt(id_vars=['Ano'], var_name='Área', value_name='Pct_Mulheres')
+
+fig = px.line(
+    df, x='Ano', y='Pct_Mulheres', color='Área',
+    markers=${ctrls.markers === 'true'},
+    line_shape='${ctrls.line_shape}',
+    title="Evolução do % de Mulheres na Graduação"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const showMarkers = ctrls.markers === 'true';
+                    const data = [
+                        {
+                            x: [2018, 2019, 2020, 2021, 2022, 2023],
+                            y: [28.4, 29.1, 30.5, 31.2, 32.8, 34.0],
+                            name: 'STEM',
+                            type: 'scatter',
+                            mode: showMarkers ? 'lines+markers' : 'lines',
+                            line: { shape: ctrls.line_shape, color: '#38bdf8', width: 3 }
+                        },
+                        {
+                            x: [2018, 2019, 2020, 2021, 2022, 2023],
+                            y: [70.2, 71.0, 71.5, 72.0, 73.1, 74.5],
+                            name: 'Saúde',
+                            type: 'scatter',
+                            mode: showMarkers ? 'lines+markers' : 'lines',
+                            line: { shape: ctrls.line_shape, color: '#ec4899', width: 3 }
+                        }
+                    ];
+                    return { data, layout: {} };
+                }
+            },
+            scatter: {
+                title: "Gráfico de Dispersão",
+                subtitle: "px.scatter",
+                tag: "Correlação & Tendências",
+                when: "Usado para verificar correlação, associação ou distribuição entre duas variáveis numéricas contínuas.",
+                why: "Identifica rapidamente agrupamentos (clusters), outliers e se existe relação positiva ou negativa.",
+                controls: [
+                    { id: 'show_trend', label: 'Linha de Tendência', type: 'select', options: [{val: 'false', label: 'Ocultar'}, {val: 'true', label: 'Exibir'}] },
+                    { id: 'bubble_size', label: 'Tamanho dos Pontos', type: 'range', min: 8, max: 20, step: 2, value: 12 }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+
+# df contendo dados das UFs
+fig = px.scatter(
+    df, 
+    x="Horas_Domesticas", 
+    y="Pct_Graduacao", 
+    color="Regiao",
+    size_max=${ctrls.bubble_size},
+    ${ctrls.show_trend === 'true' ? "trendline='ols'," : ""}
+    title="Relação entre Afazeres Domésticos e Graduação"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const size = parseInt(ctrls.bubble_size);
+                    const data = [
+                        {
+                            x: [15, 18, 22, 14, 25, 19, 21, 16],
+                            y: [45, 52, 60, 42, 68, 55, 58, 48],
+                            mode: 'markers',
+                            type: 'scatter',
+                            marker: { size: size, color: '#10b981' },
+                            name: 'Estados'
+                        }
+                    ];
+                    if (ctrls.show_trend === 'true') {
+                        data.push({
+                            x: [14, 25],
+                            y: [42, 68],
+                            mode: 'lines',
+                            type: 'scatter',
+                            line: { dash: 'dash', color: '#ef4444', width: 2 },
+                            name: 'Tendência'
+                        });
+                    }
+                    return { data, layout: {} };
+                }
+            },
+            box: {
+                title: "Boxplot",
+                subtitle: "px.box",
+                tag: "Distribuição Estatística",
+                when: "Utilize para analisar a distribuição estatística de dados, destacando mediana, quartis e discrepantes (outliers).",
+                why: "Permite comparar dispersões e variabilidade entre grupos de forma muito mais rica que simples médias.",
+                controls: [
+                    { id: 'points', label: 'Exibir Pontos Individuais', type: 'select', options: [{val: 'outliers', label: 'Apenas Outliers'}, {val: 'all', label: 'Todos os Pontos'}] },
+                    { id: 'notched', label: 'Entalhe de Mediana (Notch)', type: 'select', options: [{val: 'false', label: 'Desativado'}, {val: 'true', label: 'Ativado'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+
+fig = px.box(
+    df_melt_raca,
+    x="Grupo",
+    y="Horas",
+    color="Grupo",
+    points="${ctrls.points}",
+    notched=${ctrls.notched === 'true'},
+    title="Distribuição das Horas Dedicadas por Grupo Demográfico"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const showAll = ctrls.points === 'all';
+                    const data = [
+                        {
+                            y: [12, 14, 15, 15, 16, 17, 18, 22, 25],
+                            type: 'box',
+                            name: 'Homem Branco',
+                            boxpoints: showAll ? 'all' : 'outliers',
+                            notchspan: ctrls.notched === 'true',
+                            marker: { color: '#38bdf8' }
+                        },
+                        {
+                            y: [18, 20, 21, 23, 24, 25, 27, 31, 35],
+                            type: 'box',
+                            name: 'Mulher Preta/Parda',
+                            boxpoints: showAll ? 'all' : 'outliers',
+                            notchspan: ctrls.notched === 'true',
+                            marker: { color: '#ec4899' }
+                        }
+                    ];
+                    return { data, layout: {} };
+                }
+            },
+            histogram: {
+                title: "Histograma",
+                subtitle: "px.histogram",
+                tag: "Frequência de Dados",
+                when: "Indicado para visualizar a frequência e a forma da distribuição de uma variável numérica contínua.",
+                why: "Mostra se os dados seguem uma distribuição normal, assimétrica ou multimodal.",
+                controls: [
+                    { id: 'nbins', label: 'Número de Intervalos (Bins)', type: 'range', min: 5, max: 20, step: 1, value: 10 },
+                    { id: 'histnorm', label: 'Normalização', type: 'select', options: [{val: '', label: 'Contagem Absoluta'}, {val: 'percent', label: 'Percentual (%)'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+
+fig = px.histogram(
+    df,
+    x="Horas",
+    nbins=${ctrls.nbins},
+    histnorm='${ctrls.histnorm}',
+    title="Frequência e Distribuição das Horas de Trabalho"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const data = [{
+                        x: [10,12,12,14,15,15,15,16,17,18,18,19,20,20,21,22,23,24,25,28,30],
+                        type: 'histogram',
+                        nbinsx: parseInt(ctrls.nbins),
+                        histnorm: ctrls.histnorm,
+                        marker: { color: '#f59e0b' }
+                    }];
+                    return { data, layout: {} };
+                }
+            },
+            pie: {
+                title: "Gráfico de Pizza / Rosca",
+                subtitle: "px.pie",
+                tag: "Proporção do Todo",
+                when: "Ideal para exibir proporções relativas e porcentagens de um total completo (100%).",
+                why: "Comunicação visual imediata para poucas categorias (recomendado no máximo 5 a 6 fatias).",
+                controls: [
+                    { id: 'hole', label: 'Estilo Rosca (Hole)', type: 'range', min: 0, max: 0.7, step: 0.1, value: 0.4 }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+
+df = pd.DataFrame({
+    'Área': ['Saúde', 'Humanas', 'Exatas/STEM', 'Biológicas'],
+    'Matriculas': [4500, 3200, 2100, 1800]
+})
+
+fig = px.pie(
+    df, 
+    values='Matriculas', 
+    names='Área',
+    hole=${ctrls.hole},
+    title="Distribuição de Alunos por Área de Formação"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const data = [{
+                        values: [4500, 3200, 2100, 1800],
+                        labels: ['Saúde', 'Humanas', 'Exatas/STEM', 'Biológicas'],
+                        type: 'pie',
+                        hole: parseFloat(ctrls.hole),
+                        marker: { colors: ['#10b981', '#38bdf8', '#ef4444', '#8b5cf6'] }
+                    }];
+                    return { data, layout: {} };
+                }
+            },
+            heatmap: {
+                title: "Mapa de Calor (Heatmap)",
+                subtitle: "px.imshow",
+                tag: "Matrizes & Correlações",
+                when: "Utilizado para visualizar matrizes de correlação ou cruzamentos entre duas variáveis categóricas com valor numérico.",
+                why: "Cores intensas chamam atenção imediata para altas concentrações ou fortes correlações.",
+                controls: [
+                    { id: 'colorscale', label: 'Escala de Cores', type: 'select', options: [{val: 'Viridis', label: 'Viridis'}, {val: 'Plasma', label: 'Plasma'}, {val: 'RdBu', label: 'Red-Blue'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+import plotly.express as px
+
+# Matriz de Correlação do Pandas
+corr_matrix = df.corr()
+
+fig = px.imshow(
+    corr_matrix,
+    text_auto=True,
+    color_continuous_scale='${ctrls.colorscale}',
+    title="Matriz de Correlação das Variáveis IBGE"
+)
+
+st.plotly_chart(fig, use_container_width=True)`,
+                render: (ctrls) => {
+                    const data = [{
+                        z: [[1.0, 0.85, -0.4], [0.85, 1.0, -0.2], [-0.4, -0.2, 1.0]],
+                        x: ['Horas Domésticas', 'Diferença Gênero', '% STEM'],
+                        y: ['Horas Domésticas', 'Diferença Gênero', '% STEM'],
+                        type: 'heatmap',
+                        colorscale: ctrls.colorscale
+                    }];
+                    return { data, layout: {} };
+                }
+            },
+            metric: {
+                title: "Métricas e KPIs",
+                subtitle: "st.metric",
+                tag: "Destaque Visual Numérico",
+                when: "Ideal no topo dos dashboards para destacar os principais números e Indicadores Chave de Desempenho (KPIs).",
+                why: "Resumo executivo limpo com indicação de crescimento ou queda (delta).",
+                controls: [
+                    { id: 'delta_val', label: 'Valor do Delta', type: 'select', options: [{val: '+2.4 h/sem', label: 'Positivo (+2.4)'}, {val: '-1.1 h/sem', label: 'Negativo (-1.1)'}] }
+                ],
+                getCode: (ctrls) => `import streamlit as st
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric(
+    label="Média de Horas (Mulheres)", 
+    value="21.4 h/sem", 
+    delta="${ctrls.delta_val}"
+)
+
+col2.metric(
+    label="Média de Horas (Homens)", 
+    value="11.0 h/sem"
+)
+
+col3.metric(
+    label="Paridade STEM", 
+    value="34.2%", 
+    delta="+1.5%"
+)`,
+                render: (ctrls) => {
+                    // Render HTML mockup for st.metric instead of Plotly canvas
+                    return { isCustomHtml: true, delta: ctrls.delta_val };
+                }
+            }
+        };
+
+        let currentTab = 'bar';
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTheme();
+            switchTab('bar');
+        });
+
+        // Theme Toggle Logic
+        function setupTheme() {
+            const toggleBtn = document.getElementById('themeToggle');
+            toggleBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                // Re-render chart to fit dark/light layout
+                renderCurrentChart();
+            });
+        }
+
+        // Switch Active Chart Tab
+        function switchTab(key) {
+            currentTab = key;
+            const info = chartsData[key];
+
+            // Update Active Buttons Style
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-red/10', 'text-brand-red', 'dark:bg-brand-red/20');
+                btn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
+            });
+            const activeBtn = document.getElementById(`btn-${key}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
+                activeBtn.classList.add('bg-brand-red/10', 'text-brand-red', 'dark:bg-brand-red/20');
+            }
+
+            // Update Header
+            document.getElementById('chart-header').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-red/10 text-brand-red border border-brand-red/20">${info.tag}</span>
+                        <h2 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-2">${info.title}</h2>
+                        <p class="text-xs font-mono text-gray-500 dark:text-gray-400 mt-0.5">${info.subtitle}</p>
+                    </div>
+                </div>
+            `;
+
+            // Update Explanations
+            document.getElementById('chart-when').innerText = info.when;
+            document.getElementById('chart-why').innerText = info.why;
+
+            // Generate Control Inputs
+            const panel = document.getElementById('control-panel');
+            panel.innerHTML = '';
+
+            info.controls.forEach(ctrl => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'space-y-1';
+                
+                const label = document.createElement('label');
+                label.className = 'block font-semibold text-gray-700 dark:text-gray-300';
+                label.innerText = ctrl.label;
+                wrapper.appendChild(label);
+
+                if (ctrl.type === 'select') {
+                    const select = document.createElement('select');
+                    select.id = `ctrl-${ctrl.id}`;
+                    select.className = 'w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-brand-red outline-none';
+                    ctrl.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.val;
+                        option.innerText = opt.label;
+                        select.appendChild(option);
+                    });
+                    select.addEventListener('change', updateSimulation);
+                    wrapper.appendChild(select);
+                } else if (ctrl.type === 'range') {
+                    const input = document.createElement('input');
+                    input.type = 'range';
+                    input.id = `ctrl-${ctrl.id}`;
+                    input.min = ctrl.min;
+                    input.max = ctrl.max;
+                    input.step = ctrl.step;
+                    input.value = ctrl.value;
+                    input.className = 'w-full accent-brand-red';
+                    input.addEventListener('input', updateSimulation);
+                    wrapper.appendChild(input);
+                }
+                panel.appendChild(wrapper);
+            });
+
+            updateSimulation();
+        }
+
+        // Get Current Values from Control Inputs
+        function getControlValues() {
+            const info = chartsData[currentTab];
+            const ctrls = {};
+            info.controls.forEach(c => {
+                const el = document.getElementById(`ctrl-${c.id}`);
+                if (el) ctrls[c.id] = el.value;
+            });
+            return ctrls;
+        }
+
+        // Update Plotly Render & Code Snippet
+        function updateSimulation() {
+            const info = chartsData[currentTab];
+            const ctrls = getControlValues();
+
+            // Update Code Snippet
+            document.getElementById('code-snippet').innerText = info.getCode(ctrls);
+
+            // Render Visualization
+            renderCurrentChart();
+        }
+
+        function renderCurrentChart() {
+            const info = chartsData[currentTab];
+            const ctrls = getControlValues();
+            const renderData = info.render(ctrls);
+            const container = document.getElementById('plotly-render');
+
+            if (renderData.isCustomHtml) {
+                // Render st.metric simulator
+                const isPos = renderData.delta.includes('+');
+                container.innerHTML = `
+                    <div class="w-full h-full flex flex-col sm:flex-row items-center justify-center gap-4 p-4">
+                        <div class="bg-gray-50 dark:bg-brand-card p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex-1 w-full text-center">
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Média de Horas (Mulheres)</span>
+                            <div class="text-2xl font-black text-gray-900 dark:text-white my-1">21.4 h/sem</div>
+                            <div class="text-xs font-bold ${isPos ? 'text-emerald-500' : 'text-rose-500'} flex items-center justify-center gap-1">
+                                <i class="fa-solid ${isPos ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> ${renderData.delta}
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex-1 w-full text-center">
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Média de Horas (Homens)</span>
+                            <div class="text-2xl font-black text-gray-900 dark:text-white my-1">11.0 h/sem</div>
+                            <div class="text-xs font-bold text-gray-400">Sem alteração</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            const isDark = document.documentElement.classList.contains('dark');
+
+            const layout = {
+                autosize: true,
+                margin: { l: 40, r: 20, t: 30, b: 40 },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: {
+                    color: isDark ? '#94a3b8' : '#334155',
+                    family: 'Inter, sans-serif'
+                },
+                xaxis: {
+                    gridcolor: isDark ? '#1e293b' : '#e2e8f0',
+                    zerolinecolor: isDark ? '#334155' : '#cbd5e1'
+                },
+                yaxis: {
+                    gridcolor: isDark ? '#1e293b' : '#e2e8f0',
+                    zerolinecolor: isDark ? '#334155' : '#cbd5e1'
+                },
+                legend: { orientation: 'h', y: -0.2 },
+                ...renderData.layout
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+
+            Plotly.newPlot('plotly-render', renderData.data, layout, config);
+        }
+
+        // Copy Code Snippet Function
+        function copyCode() {
+            const codeText = document.getElementById('code-snippet').innerText;
+            
+            // Clipboard Fallback Strategy for inner frames
+            const textArea = document.createElement("textarea");
+            textArea.value = codeText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            const copyIcon = document.getElementById('copy-icon');
+            const copyText = document.getElementById('copy-text');
+
+            copyIcon.className = 'fa-solid fa-check text-emerald-400';
+            copyText.innerText = 'Copiado!';
+
+            setTimeout(() => {
+                copyIcon.className = 'fa-regular fa-copy';
+                copyText.innerText = 'Copiar Código';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
